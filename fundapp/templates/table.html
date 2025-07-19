@@ -226,7 +226,7 @@
                             <tr>
                                 <td>{{ contribution.name }}</td>
                                 <td>{{ contribution.amount|intcomma }}</td>
-                                <td>{{ contribution.timestamp|naturaltime }}</td>
+                                <td>{{ contribution.timestamp|date:"d M Y, H:i A" }}</td>
                             </tr>
                         {% empty %}
                             <tr>

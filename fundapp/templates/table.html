@@ -177,14 +177,42 @@
                 display: block;
             }
         }
+
+
+        
+    #menu-icon {
+    font-size: 30px;
+    padding: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: #d7d8d8fd;
+    animation: pulseZoom 1s infinite ease-in-out, ambulanceFlash 1s infinite;
+}
+
+/* Zoom in and out */
+@keyframes pulseZoom {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Red & blue flashing like ambulance light */
+@keyframes ambulanceFlash {
+    0%   { color: red; }
+    25%  { color: blue; }
+    50%  { color: red; }
+    75%  { color: blue; }
+    100% { color: red; }
+}
     </style>
 </head>
 <body>
 
 <div class="layout">
     <div class="hamburger" onclick="toggleSidebar()">
-        &#9776;
+    <i class="fas fa-bars" id="menu-icon"></i>
     </div>
+
 
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">

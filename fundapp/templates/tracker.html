@@ -1,0 +1,315 @@
+{% load static %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TAFES KIUT Fund Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Static and external styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #0d47a1;
+            --accent: #1976d2;
+            --light: #f5f5f5;
+            --text: #333;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--light);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .layout {
+            display: flex;
+            flex: 1;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            flex-shrink: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sidebar-links a,
+        .user-info a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-links a:hover,
+        .user-info a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 1rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 0 0 12px 12px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .container {
+            padding: 1rem;
+            max-width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .progress-section,
+        form,
+        .contributions-list {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: #e0e0e0;
+            border-radius: 4px;
+            position: relative;
+            height: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #2196f3, #64b5f6);
+            transition: width 0.5s;
+        }
+
+        .progress-container span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        form input,
+        form textarea,
+        form select {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        form button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        form button:hover {
+            opacity: 0.9;
+        }
+
+        .contributions-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .contributions-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background: #f0f0f0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .hamburger {
+            display: none;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            z-index: 1100;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 250px;
+                height: 100vh;
+                background: linear-gradient(135deg, var(--primary), var(--accent));
+                padding: 1.5rem;
+                z-index: 1000;
+                overflow-y: auto;
+            }
+
+            .sidebar.active {
+                display: block;
+            }
+
+            .hamburger {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+    <div class="hamburger" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>TAFES</h2>
+        </div>
+        <div class="sidebar-links">
+            <a href="/"><i class="fas fa-home"></i> Home</a>
+            <a href="{% url 'contribution_list' %}"><i class="fas fa-chart-bar"></i> Report</a>
+            <a href="#"><i class="fas fa-info-circle"></i> About</a>
+            {% if user.is_staff %}
+         <a href="{% url 'admin:index' %}"> <i class="fas fa-lock"></i> Admin</a>
+          {% endif %}
+
+        </div>
+        <div class="user-info">
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Register</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1 style="color: #f0f0f0;">TAFES KIUT Fund Tracker</h1>
+            <p style="color: #f0f0f0;">Track contributions towards {{ target_amount|intcomma }} TZS</p>
+        </header>
+
+        <div class="container">
+            <div class="progress-section">
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: {{ progress }}%;"></div>
+                    <span style="color: #ff0000;">{{ progress }}%</span>
+                </div>
+                <p style="text-align: center;">
+                               Hi,<span style="color: #ff0000;"> <b>{{ user.username }}</b></span> we have
+    Collected: <strong>{{ total_collected|intcomma }}</strong> TZS out of {{ target_amount|intcomma }} TZS
+                </p>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit">Add Contribution</button>
+            </form>
+
+            <div class="contributions-list">
+                <h2>Recent Contributions</h2>
+                <ul>
+                    {% for contrib in contributions %}
+                        <li>{{ contrib.name }} - {{ contrib.amount|intcomma }} TZS</li>
+                    {% empty %}
+                        <li>No contributions yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    &copy; {{ year|default:2025 }} TAFES KIUT. All rights reserved.
+</footer>
+
+<!-- JavaScript -->
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("active");
+    }
+</script>
+</body>
+</html>
